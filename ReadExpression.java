@@ -316,6 +316,10 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == ')')
                     {
+                        if (leftParentheses <= 0)
+                        {
+                            pda = states.fail;
+                        }
                         rightParentheses++;
                         pda = states.q7;
                         //pop
@@ -348,6 +352,10 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == ')')
                     {
+                        if (leftParentheses <= 0)
+                        {
+                            pda = states.fail;
+                        }
                         rightParentheses++;
                         pda = states.q7;
                         //pop
