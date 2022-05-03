@@ -17,14 +17,7 @@ public class Test
                 break;
             }
             value = reader.GetFloat(input);
-            if (value == -1)
-            {
-                System.out.println("");
-            }
-            else
-            {
-                System.out.println(value);
-            }
+            System.out.println(value);
             
         }
         scanner.close();
