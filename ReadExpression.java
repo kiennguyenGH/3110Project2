@@ -30,7 +30,7 @@ public class ReadExpression {
             switch (pda)
             {
                 case q0:
-                    if (input.charAt(i) == '.' || Character.isDigit(input.charAt(i)))
+                    if (input.charAt(i) == '.' || Character.isLetterOrDigit(input.charAt(i)))
                     {
                         currentFloat += input.charAt(i);
                         pda = states.q1;
@@ -59,7 +59,7 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
                     {
-                        if (reader.GetFloat(currentFloat) != -1)
+                        if (reader.GetFloat(currentFloat) == -1)
                         {
                             pda = states.fail;
                         }
@@ -149,7 +149,7 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
                     {
-                        if (reader.GetFloat(currentFloat) != -1)
+                        if (reader.GetFloat(currentFloat) == -1)
                         {
                             pda = states.fail;
                         }
@@ -218,7 +218,7 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
                     {
-                        if (reader.GetFloat(currentFloat) != -1)
+                        if (reader.GetFloat(currentFloat) == -1)
                         {
                             pda = states.fail;
                         }
@@ -406,16 +406,25 @@ public class ReadExpression {
             System.out.println("Invalid expression");
             pda = states.fail;
         }
+        if (currentFloat.length() > 0)
+        {
+            if (reader.GetFloat(currentFloat) == -1)
+            {
+                System.out.println("Invalid expression");
+                pda = states.fail;
+            }
+            else
+            {
+                postfix[numElements] = currentFloat;
+                currentFloat = "";
+                numElements++;
+            }
+        }
         if (pda == states.fail)
         {
             return -1;
         }
-        if (currentFloat.length() > 0)
-        {
-            postfix[numElements] = currentFloat;
-            currentFloat = "";
-            numElements++;
-        }
+
         while (!postfixStack.isEmpty()) {
             String add = "";
             add += postfixStack.pop();
