@@ -1,4 +1,5 @@
 public class ReadExpression {
+
     public enum states
     {
         q0, // start
@@ -14,106 +15,58 @@ public class ReadExpression {
 
     public float getValue(String input)
     {
+        LinkedStack<Character> postfixStack = new LinkedStack<Character>();
+        String[] postfix = new String[100];
+        int numElements = 0;
+        int leftParentheses = 0;
         states pda = states.q0;
         ReadString reader = new ReadString();
         String currentFloat = "";
-        String[] postfix = new String[100];
-        int postfixLength = 0;
-        int leftParentheses = 0;
-        int rightParentheses = 0;
         for (int i = 0; i < input.length(); i++)
         {
             switch (pda)
             {
-                //Start state
                 case q0:
                     if (input.charAt(i) == '.' || Character.isDigit(input.charAt(i)))
                     {
-                        pda = states.q1;
                         currentFloat += input.charAt(i);
+                        pda = states.q1;
                     }
                     else if (input.charAt(i) == '(')
                     {
-                        pda = states.q3;
+                        postfixStack.push(input.charAt(i));
                         leftParentheses++;
-                        //push
+                        pda = states.q3;
                     }
                     else
                     {
                         pda = states.fail;
                     }
                     break;
-                // float (without parentheses)
                 case q1:
-                    if (input.charAt(i) == 'e'
-                        || input.charAt(i) == 'E'
-                        || input.charAt(i) == 'f'
-                        || input.charAt(i) == 'd'
-                        || input.charAt(i) == 'D'
-                        || input.charAt(i) == '_'
-                        || input.charAt(i) == '.'
-                        || Character.isDigit(input.charAt(i)))
+                    if (input.charAt(i) == '.' || Character.isLetterOrDigit(input.charAt(i)) || input.charAt(i) == '_')
                     {
                         currentFloat += input.charAt(i);
                         pda = states.q1;
                     }
-                    else if (input.charAt(i) == '+')
+                    else if ((input.charAt(i) == '+' || input.charAt(i) == '-') && (currentFloat.charAt(currentFloat.length()-1) == 'e' || currentFloat.charAt(currentFloat.length()-1) == 'E'))
                     {
-                        if (currentFloat.charAt(currentFloat.length()) == 'e' 
-                        || currentFloat.charAt(currentFloat.length()) == 'E')
-                        {
-                            currentFloat += input.charAt(i);
-                            pda = states.q1;
-                        }
-                        else
-                        {
-                            if (reader.GetFloat(currentFloat) == -1)
-                            {
-                                pda = states.fail;
-                            }
-                            else
-                            {
-                                postfix[postfixLength] = currentFloat;
-                                currentFloat = "";
-                                postfixLength++;
-                                pda = states.q2;
-                                //push
-                            }
-                        }
+                        currentFloat += input.charAt(i);
+                        pda = states.q1;
                     }
-                    else if (input.charAt(i) == '-')
+                    else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
                     {
-                        if (currentFloat.charAt(currentFloat.length()) == 'e' 
-                        || currentFloat.charAt(currentFloat.length()) == 'E')
-                        {
-                            currentFloat += input.charAt(i);
-                            pda = states.q1;
+                        postfix[numElements] = currentFloat;
+                        currentFloat = "";
+                        numElements++;
+                        while (!postfixStack.isEmpty() && precedence(input.charAt(i)) <= precedence(postfixStack.peek())) {
+                            String add = "";
+                            add += postfixStack.pop();
+                            postfix[numElements] = add;
+                            numElements++;
                         }
-                        else
-                        {
-                            if (reader.GetFloat(currentFloat) == -1)
-                            {
-                                pda = states.fail;
-                            }
-                            else
-                            {
-                                postfix[postfixLength] = currentFloat;
-                                currentFloat = "";
-                                postfixLength++;
-                                pda = states.q2;
-                                //push
-                            }
-                        }
-                    }
-                    else if (input.charAt(i) == '*')
-                    {
+                        postfixStack.push(input.charAt(i));
                         pda = states.q2;
-                        //push
-                    }
-                    else if (input.charAt(i) == '/')
-                    {
-                        pda = states.q2;
-                        //push
                     }
                     else
                     {
@@ -123,14 +76,14 @@ public class ReadExpression {
                 case q2:
                     if (input.charAt(i) == '.' || Character.isDigit(input.charAt(i)))
                     {
-                        pda = states.q1;
                         currentFloat += input.charAt(i);
+                        pda = states.q1;
                     }
                     else if (input.charAt(i) == '(')
                     {
-                        pda = states.q3;
+                        postfixStack.push(input.charAt(i));
                         leftParentheses++;
-                        //push
+                        pda = states.q3;
                     }
                     else
                     {
@@ -138,88 +91,46 @@ public class ReadExpression {
                     }
                     break;
                 case q3:
-                    if (input.charAt(i) == '.' || Character.isDigit(input.charAt(i)))
+                    if (input.charAt(i) == '(')
                     {
-                        pda = states.q4;
-                        currentFloat += input.charAt(i);
-                    }
-                    else if (input.charAt(i) == '(')
-                    {
-                        pda = states.q3;
+                        postfixStack.push(input.charAt(i));
                         leftParentheses++;
-                        //push
+                        pda = states.q3;
+                    }
+                    else if (input.charAt(i) == '.' || Character.isDigit(input.charAt(i)))
+                    {
+                        currentFloat += input.charAt(i);
+                        pda = states.q4;
+                    }
+                    else
+                    {
+                        pda = states.fail;
                     }
                     break;
                 case q4:
-                    if (input.charAt(i) == 'e'
-                    || input.charAt(i) == 'E'
-                    || input.charAt(i) == 'f'
-                    || input.charAt(i) == 'd'
-                    || input.charAt(i) == 'D'
-                    || input.charAt(i) == '_'
-                    || input.charAt(i) == '.'
-                    || Character.isDigit(input.charAt(i)))
+                    if (input.charAt(i) == '.' || Character.isLetterOrDigit(input.charAt(i)) || input.charAt(i) == '_')
                     {
                         currentFloat += input.charAt(i);
                         pda = states.q4;
                     }
-                    else if (input.charAt(i) == '+')
+                    else if ((input.charAt(i) == '+' || input.charAt(i) == '-') && (currentFloat.charAt(currentFloat.length()-1) == 'e' || currentFloat.charAt(currentFloat.length()-1) == 'E'))
                     {
-                        if (currentFloat.charAt(currentFloat.length()) == 'e' 
-                        || currentFloat.charAt(currentFloat.length()) == 'E')
-                        {
-                            currentFloat += input.charAt(i);
-                            pda = states.q4;
-                        }
-                        else
-                        {
-                            if (reader.GetFloat(currentFloat) == -1)
-                            {
-                                pda = states.fail;
-                            }
-                            else
-                            {
-                                postfix[postfixLength] = currentFloat;
-                                currentFloat = "";
-                                postfixLength++;
-                                pda = states.q5;
-                                //push
-                            }
-                        }
+                        currentFloat += input.charAt(i);
+                        pda = states.q4;
                     }
-                    else if (input.charAt(i) == '-')
+                    else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
                     {
-                        if (currentFloat.charAt(currentFloat.length()) == 'e' 
-                        || currentFloat.charAt(currentFloat.length()) == 'E')
-                        {
-                            currentFloat += input.charAt(i);
-                            pda = states.q4;
+                        postfix[numElements] = currentFloat;
+                        currentFloat = "";
+                        numElements++;
+                        while (!postfixStack.isEmpty() && precedence(input.charAt(i)) <= precedence(postfixStack.peek())) {
+                            String add = "";
+                            add += postfixStack.pop();
+                            postfix[numElements] = add;
+                            numElements++;
                         }
-                        else
-                        {
-                            if (reader.GetFloat(currentFloat) == -1)
-                            {
-                                pda = states.fail;
-                            }
-                            else
-                            {
-                                postfix[postfixLength] = currentFloat;
-                                currentFloat = "";
-                                postfixLength++;
-                                pda = states.q5;
-                                //push
-                            }
-                        }
-                    }
-                    else if (input.charAt(i) == '*')
-                    {
+                        postfixStack.push(input.charAt(i));
                         pda = states.q5;
-                        //push
-                    }
-                    else if (input.charAt(i) == '/')
-                    {
-                        pda = states.q5;
-                        //push
                     }
                     else
                     {
@@ -229,14 +140,14 @@ public class ReadExpression {
                 case q5:
                     if (input.charAt(i) == '.' || Character.isDigit(input.charAt(i)))
                     {
-                        pda = states.q6;
                         currentFloat += input.charAt(i);
+                        pda = states.q6;
                     }
                     else if (input.charAt(i) == '(')
                     {
-                        pda = states.q3;
+                        postfixStack.push(input.charAt(i));
                         leftParentheses++;
-                        //push
+                        pda = states.q3;
                     }
                     else
                     {
@@ -244,85 +155,48 @@ public class ReadExpression {
                     }
                     break;
                 case q6:
-                    if (input.charAt(i) == 'e'
-                    || input.charAt(i) == 'E'
-                    || input.charAt(i) == 'f'
-                    || input.charAt(i) == 'd'
-                    || input.charAt(i) == 'D'
-                    || input.charAt(i) == '_'
-                    || input.charAt(i) == '.'
-                    || Character.isDigit(input.charAt(i)))
+                    if (input.charAt(i) == '.' || Character.isLetterOrDigit(input.charAt(i)) || input.charAt(i) == '_')
                     {
                         currentFloat += input.charAt(i);
                         pda = states.q6;
                     }
-                    else if (input.charAt(i) == '+')
+                    else if ((input.charAt(i) == '+' || input.charAt(i) == '-') && (currentFloat.charAt(currentFloat.length()-1) == 'e' || currentFloat.charAt(currentFloat.length()-1) == 'E'))
                     {
-                        if (currentFloat.charAt(currentFloat.length()) == 'e' 
-                        || currentFloat.charAt(currentFloat.length()) == 'E')
-                        {
-                            currentFloat += input.charAt(i);
-                            pda = states.q6;
-                        }
-                        else
-                        {
-                            if (reader.GetFloat(currentFloat) == -1)
-                            {
-                                pda = states.fail;
-                            }
-                            else
-                            {
-                                postfix[postfixLength] = currentFloat;
-                                currentFloat = "";
-                                postfixLength++;
-                                pda = states.q5;
-                                //push
-                            }
-                        }
+                        currentFloat += input.charAt(i);
+                        pda = states.q6;
                     }
-                    else if (input.charAt(i) == '-')
+                    else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
                     {
-                        if (currentFloat.charAt(currentFloat.length()) == 'e' 
-                        || currentFloat.charAt(currentFloat.length()) == 'E')
-                        {
-                            currentFloat += input.charAt(i);
-                            pda = states.q6;
+                        postfix[numElements] = currentFloat;
+                        currentFloat = "";
+                        numElements++;
+                        while (!postfixStack.isEmpty() && precedence(input.charAt(i)) <= precedence(postfixStack.peek())) {
+                            String add = "";
+                            add += postfixStack.pop();
+                            postfix[numElements] = add;
+                            numElements++;
                         }
-                        else
-                        {
-                            if (reader.GetFloat(currentFloat) == -1)
-                            {
-                                pda = states.fail;
-                            }
-                            else
-                            {
-                                postfix[postfixLength] = currentFloat;
-                                currentFloat = "";
-                                postfixLength++;
-                                pda = states.q5;
-                                //push
-                            }
-                        }
-                    }
-                    else if (input.charAt(i) == '*')
-                    {
+                        postfixStack.push(input.charAt(i));
                         pda = states.q5;
-                        //push
-                    }
-                    else if (input.charAt(i) == '/')
-                    {
-                        pda = states.q5;
-                        //push
                     }
                     else if (input.charAt(i) == ')')
                     {
-                        if (leftParentheses <= 0)
+                        if (currentFloat.length() > 0)
                         {
-                            pda = states.fail;
+                            postfix[numElements] = currentFloat;
+                            currentFloat = "";
+                            numElements++;
                         }
-                        rightParentheses++;
+                        char topOperator = postfixStack.pop();
+                        while (topOperator != '(')
+                        {
+                            String add = "";
+                            add += topOperator;
+                            postfix[numElements] = add;
+                            numElements++;
+                            topOperator = postfixStack.pop();
+                        }
                         pda = states.q7;
-                        //pop
                     }
                     else
                     {
@@ -330,50 +204,88 @@ public class ReadExpression {
                     }
                     break;
                 case q7:
-                    if (input.charAt(i) == '+')
+                    if (input.charAt(i) == ')')
                     {
-                        pda = states.q5;
-                        //push
-                    }
-                    else if (input.charAt(i) == '-')
-                    {
-                        pda = states.q5;
-                        //push
-                    }
-                    else if (input.charAt(i) == '*')
-                    {
-                        pda = states.q5;
-                        //push
-                    }
-                    else if (input.charAt(i) == '/')
-                    {
-                        pda = states.q5;
-                        //push
-                    }
-                    else if (input.charAt(i) == ')')
-                    {
-                        if (leftParentheses <= 0)
+                        if (currentFloat.length() > 0)
                         {
-                            pda = states.fail;
+                            postfix[numElements] = currentFloat;
+                            currentFloat = "";
+                            numElements++;
                         }
-                        rightParentheses++;
+                        char topOperator = postfixStack.pop();
+                        while (topOperator != '(')
+                        {
+                            String add = "";
+                            add += topOperator;
+                            postfix[numElements] = add;
+                            numElements++;
+                            topOperator = postfixStack.pop();
+                        }
                         pda = states.q7;
-                        //pop
+                    }
+                    else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
+                    {
+                        while (!postfixStack.isEmpty() && precedence(input.charAt(i)) <= precedence(postfixStack.peek())) {
+                            String add = "";
+                            add += postfixStack.pop();
+                            postfix[numElements] = add;
+                            numElements++;
+                        }
+                        pda = states.q5;
+                    }
+                    else
+                    {
+                        pda = states.fail;
                     }
                     break;
                 default:
-                    pda = states.fail;
+                    break;
             }
             if (pda == states.fail)
             {
+                System.out.println("Invalid expression");
                 break;
             }
         }
-
-        for (int i = 0; i < postfixLength; i++)
+        if (pda == states.fail)
         {
-            //evaulate postfix (with array)
+            return -1;
         }
+        if (currentFloat.length() > 0)
+        {
+            postfix[numElements] = currentFloat;
+            currentFloat = "";
+            numElements++;
+        }
+        while (!postfixStack.isEmpty()) {
+            String add = "";
+            add += postfixStack.pop();
+            postfix[numElements] = add;
+            numElements++;
+        }
+        printPostfix(postfix, numElements);
+        System.out.println(currentFloat);
         return -1;
+
     }
+
+    private static void printPostfix(String[] input, int length)
+    {
+        System.out.print("Postfix: ");
+        for (int i = 0; i < length; i++)
+        {
+            System.out.print(input[i] + " ");
+        }
+        System.out.println();
+    }
+
+    private static int precedence(char character) {
+		switch (character) {
+			case '+' : case '-':
+				return 0;
+			case '*' : case '/':
+				return 1;
+		}
+		return -1;
+	}
 }

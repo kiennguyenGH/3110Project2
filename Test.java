@@ -5,20 +5,22 @@ public class Test
     {
         float value;
         ReadString reader = new ReadString();
+        ReadExpression expression = new ReadExpression();
         String input = "";
         Scanner scanner = new Scanner(System.in);
-        
+       
         while (true)
         {
+            
             System.out.println("Enter a java floating point literal: (q to quit)");
             input = scanner.nextLine();
             if (input.equals("q"))
             {
                 break;
             }
-            value = reader.GetFloat(input);
-            System.out.println(value);
-            
+            value = expression.getValue(input);
+            // System.out.println(value);
+
         }
         scanner.close();
 
