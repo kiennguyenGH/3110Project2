@@ -15,7 +15,7 @@ public class ReadExpression {
         q10,
         fail // fail
     }
-
+    
     public float getValue(String input)
     {
         LinkedStack<Character> postfixStack = new LinkedStack<Character>();
@@ -483,12 +483,20 @@ public class ReadExpression {
             }
         }
 
-        //Check if final state is accept state
-        // if (pda != states.fail || leftParentheses != 0 || (input.charAt(input.length()-1) != ')' && !Character.isLetterOrDigit(input.charAt(input.length()-1)) && input.charAt(input.length()-1) != '.'))
-        // {
-        //     System.out.println("Invalid expression");
-        //     pda = states.fail;
-        // }
+        // Check if final state is accept state
+        if ((pda == states.q1 || pda == states.q4 || pda == states.q6 || pda == states.q7 || pda == states.q8) && leftParentheses == 0 && pda != states.fail)
+        {
+            System.out.println("Valid expression");
+        }
+        else if (pda == states.fail)
+        {
+            return -1;
+        }
+        else
+        {
+            System.out.println("Invalid expression");
+            pda = states.fail;
+        }
 
         if (pda == states.fail)
         {
