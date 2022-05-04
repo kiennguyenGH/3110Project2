@@ -2,6 +2,7 @@
 
 Project 2 for 3110:
 Evaluates java floating point literals and performs arithmetic operations with precedence using (+,-,/,*) and parentheses
+Code for StackInterface, LinkedStack, and postfix creation and evaluation used is from Hao Ji's CS2400 Data Structures course
 
 How to run program:
   With command prompt (requires JDK installed):
