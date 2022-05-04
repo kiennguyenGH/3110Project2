@@ -391,6 +391,27 @@ public class ReadExpression {
                         postfixStack.push(input.charAt(i));
                         pda = states.q5;
                     }
+                    else if (input.charAt(i) == ')')
+                    {
+                        if (leftParentheses > 0)
+                        {
+                            char topOperator = postfixStack.pop();
+                            while (topOperator != '(')
+                            {
+                                String add = "";
+                                add += topOperator;
+                                postfix[numElements] = add;
+                                numElements++;
+                                topOperator = postfixStack.pop();
+                            }
+                            leftParentheses--;
+                            pda = states.q7;
+                        }
+                        else
+                        {
+                            pda = states.fail;
+                        }
+                    }
                     else
                     {
                         pda = states.fail;
@@ -432,7 +453,6 @@ public class ReadExpression {
                         {
                             pda = states.fail;
                         }
-
                     }
                     else
                     {
