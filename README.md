@@ -15,5 +15,7 @@ How to run program:
 Input expressions and program will evaluate
 - If expression is accepted, the program will print "Valid expression" and print out the final number on at the bottom
 - If expression is rejected, program will print "Invalid expression" and print out -1, (If -1 is printed and the expression is valid, then it will say 'valid expression' instead)
+
+
 WARNING:
 - During long expressions, program will print out extra lines and random numbers, but that should not affect the final value of the evaluated expression printed out at the bottom
