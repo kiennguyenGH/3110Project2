@@ -13,7 +13,7 @@ How to run program:
   - Run Test.java with IDE compatible with java
 
 Input expressions and program will evaluate
-- If expression is accepted, the program will print "Valid expression" and print out the final number on at the bottom
+- If expression is accepted, the program will print "Valid expression" and print out the postfix and final number of the evaulated postfix on at the bottom
 - If expression is rejected, program will print "Invalid expression" and print out -1, (If -1 is printed and the expression is valid, then it will say 'valid expression' instead)
 
 
