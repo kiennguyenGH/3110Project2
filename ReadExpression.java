@@ -231,6 +231,7 @@ public class ReadExpression {
                             numElements++;
                             topOperator = postfixStack.pop();
                         }
+                        leftParentheses--;
                         pda = states.q7;
                     }
                     else if (input.charAt(i) == ' ')
@@ -266,6 +267,7 @@ public class ReadExpression {
                             numElements++;
                             topOperator = postfixStack.pop();
                         }
+                        leftParentheses--;
                         pda = states.q7;
                     }
                     else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
@@ -357,6 +359,7 @@ public class ReadExpression {
                             numElements++;
                             topOperator = postfixStack.pop();
                         }
+                        leftParentheses--;
                         pda = states.q7;
                     }
                     else
@@ -372,6 +375,13 @@ public class ReadExpression {
                 System.out.println("Invalid expression");
                 break;
             }
+        }
+        
+        //Check if final state is accept state
+        if (leftParentheses != 0 && input.charAt(input.length()-1) != ')' && Character.isLetterOrDigit(input.charAt(input.length()-1)))
+        {
+            System.out.println("Invalid expression");
+            pda = states.fail;
         }
         if (pda == states.fail)
         {
