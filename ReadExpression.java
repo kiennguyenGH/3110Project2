@@ -59,17 +59,25 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
                     {
-                        postfix[numElements] = currentFloat;
-                        currentFloat = "";
-                        numElements++;
-                        while (!postfixStack.isEmpty() && precedence(input.charAt(i)) <= precedence(postfixStack.peek())) {
-                            String add = "";
-                            add += postfixStack.pop();
-                            postfix[numElements] = add;
-                            numElements++;
+                        if (reader.GetFloat(currentFloat) != -1)
+                        {
+                            pda = states.fail;
                         }
-                        postfixStack.push(input.charAt(i));
-                        pda = states.q2;
+                        else
+                        {
+                            postfix[numElements] = currentFloat;
+                            currentFloat = "";
+                            numElements++;
+                            while (!postfixStack.isEmpty() && precedence(input.charAt(i)) <= precedence(postfixStack.peek())) {
+                                String add = "";
+                                add += postfixStack.pop();
+                                postfix[numElements] = add;
+                                numElements++;
+                            }
+                            postfixStack.push(input.charAt(i));
+                            pda = states.q2;
+                        }
+
                     }
                     else if (input.charAt(i) == ' ')
                     {
@@ -141,17 +149,25 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
                     {
-                        postfix[numElements] = currentFloat;
-                        currentFloat = "";
-                        numElements++;
-                        while (!postfixStack.isEmpty() && precedence(input.charAt(i)) <= precedence(postfixStack.peek())) {
-                            String add = "";
-                            add += postfixStack.pop();
-                            postfix[numElements] = add;
-                            numElements++;
+                        if (reader.GetFloat(currentFloat) != -1)
+                        {
+                            pda = states.fail;
                         }
-                        postfixStack.push(input.charAt(i));
-                        pda = states.q5;
+                        else
+                        {
+                            postfix[numElements] = currentFloat;
+                            currentFloat = "";
+                            numElements++;
+                            while (!postfixStack.isEmpty() && precedence(input.charAt(i)) <= precedence(postfixStack.peek())) {
+                                String add = "";
+                                add += postfixStack.pop();
+                                postfix[numElements] = add;
+                                numElements++;
+                            }
+                            postfixStack.push(input.charAt(i));
+                            pda = states.q5;
+                        }
+
                     }
                     else if (input.charAt(i) == ' ')
                     {
@@ -202,17 +218,24 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
                     {
-                        postfix[numElements] = currentFloat;
-                        currentFloat = "";
-                        numElements++;
-                        while (!postfixStack.isEmpty() && precedence(input.charAt(i)) <= precedence(postfixStack.peek())) {
-                            String add = "";
-                            add += postfixStack.pop();
-                            postfix[numElements] = add;
-                            numElements++;
+                        if (reader.GetFloat(currentFloat) != -1)
+                        {
+                            pda = states.fail;
                         }
-                        postfixStack.push(input.charAt(i));
-                        pda = states.q5;
+                        else
+                        {
+                            postfix[numElements] = currentFloat;
+                            currentFloat = "";
+                            numElements++;
+                            while (!postfixStack.isEmpty() && precedence(input.charAt(i)) <= precedence(postfixStack.peek())) {
+                                String add = "";
+                                add += postfixStack.pop();
+                                postfix[numElements] = add;
+                                numElements++;
+                            }
+                            postfixStack.push(input.charAt(i));
+                            pda = states.q5;
+                        }
                     }
                     else if (input.charAt(i) == ')')
                     {
@@ -376,7 +399,7 @@ public class ReadExpression {
                 break;
             }
         }
-        
+
         //Check if final state is accept state
         if (leftParentheses != 0 && input.charAt(input.length()-1) != ')' && Character.isLetterOrDigit(input.charAt(input.length()-1)))
         {

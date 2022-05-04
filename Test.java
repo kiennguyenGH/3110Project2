@@ -4,7 +4,6 @@ public class Test
     public static void main (String[] args)
     {
         float value;
-        ReadString reader = new ReadString();
         ReadExpression expression = new ReadExpression();
         String input = "";
         Scanner scanner = new Scanner(System.in);
