@@ -169,6 +169,38 @@ public class ReadExpression {
                         }
 
                     }
+                    else if (input.charAt(i) == ')')
+                    {
+                        if (leftParentheses <= 0)
+                        {
+                            pda = states.fail;
+                        }
+                        else
+                        {
+
+                            if (reader.GetFloat(currentFloat) == -1)
+                            {
+                                pda = states.fail;
+                            }
+                            else
+                            {
+                                postfix[numElements] = currentFloat;
+                                currentFloat = "";
+                                numElements++;
+                                char topOperator = postfixStack.pop();
+                                while (topOperator != '(')
+                                {
+                                    String add = "";
+                                    add += topOperator;
+                                    postfix[numElements] = add;
+                                    numElements++;
+                                    topOperator = postfixStack.pop();
+                                }
+                                leftParentheses--;
+                                pda = states.q7;
+                            }
+                        }
+                    }
                     else if (input.charAt(i) == ' ')
                     {
                         if (!currentFloat.equals(""))
@@ -239,23 +271,35 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == ')')
                     {
-                        if (currentFloat.length() > 0)
+                        if (leftParentheses <= 0)
                         {
-                            postfix[numElements] = currentFloat;
-                            currentFloat = "";
-                            numElements++;
+                            pda = states.fail;
                         }
-                        char topOperator = postfixStack.pop();
-                        while (topOperator != '(')
+                        else
                         {
-                            String add = "";
-                            add += topOperator;
-                            postfix[numElements] = add;
-                            numElements++;
-                            topOperator = postfixStack.pop();
+
+                            if (reader.GetFloat(currentFloat) == -1)
+                            {
+                                pda = states.fail;
+                            }
+                            else
+                            {
+                                postfix[numElements] = currentFloat;
+                                currentFloat = "";
+                                numElements++;
+                                char topOperator = postfixStack.pop();
+                                while (topOperator != '(')
+                                {
+                                    String add = "";
+                                    add += topOperator;
+                                    postfix[numElements] = add;
+                                    numElements++;
+                                    topOperator = postfixStack.pop();
+                                }
+                                leftParentheses--;
+                                pda = states.q7;
+                            }
                         }
-                        leftParentheses--;
-                        pda = states.q7;
                     }
                     else if (input.charAt(i) == ' ')
                     {
@@ -275,23 +319,20 @@ public class ReadExpression {
                 case q7:
                     if (input.charAt(i) == ')')
                     {
-                        if (currentFloat.length() > 0)
+                        if (leftParentheses > 0)
                         {
-                            postfix[numElements] = currentFloat;
-                            currentFloat = "";
-                            numElements++;
+                            char topOperator = postfixStack.pop();
+                            while (topOperator != '(')
+                            {
+                                String add = "";
+                                add += topOperator;
+                                postfix[numElements] = add;
+                                numElements++;
+                                topOperator = postfixStack.pop();
+                            }
+                            leftParentheses--;
+                            pda = states.q7;
                         }
-                        char topOperator = postfixStack.pop();
-                        while (topOperator != '(')
-                        {
-                            String add = "";
-                            add += topOperator;
-                            postfix[numElements] = add;
-                            numElements++;
-                            topOperator = postfixStack.pop();
-                        }
-                        leftParentheses--;
-                        pda = states.q7;
                     }
                     else if (input.charAt(i) == '+' || input.charAt(i) == '-' || input.charAt(i) == '*' || input.charAt(i) == '/')
                     {
@@ -373,17 +414,25 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == ')')
                     {
-                        char topOperator = postfixStack.pop();
-                        while (topOperator != '(')
+                        if (leftParentheses > 0)
                         {
-                            String add = "";
-                            add += topOperator;
-                            postfix[numElements] = add;
-                            numElements++;
-                            topOperator = postfixStack.pop();
+                            char topOperator = postfixStack.pop();
+                            while (topOperator != '(')
+                            {
+                                String add = "";
+                                add += topOperator;
+                                postfix[numElements] = add;
+                                numElements++;
+                                topOperator = postfixStack.pop();
+                            }
+                            leftParentheses--;
+                            pda = states.q7;
                         }
-                        leftParentheses--;
-                        pda = states.q7;
+                        else
+                        {
+                            pda = states.fail;
+                        }
+
                     }
                     else
                     {
@@ -399,14 +448,7 @@ public class ReadExpression {
                 break;
             }
         }
-
-        //Check if final state is accept state
-        if (leftParentheses != 0 && input.charAt(input.length()-1) != ')' && Character.isLetterOrDigit(input.charAt(input.length()-1)))
-        {
-            System.out.println("Invalid expression");
-            pda = states.fail;
-        }
-        if (currentFloat.length() > 0)
+        if (currentFloat.length() > 0 && pda != states.fail)
         {
             if (reader.GetFloat(currentFloat) == -1)
             {
@@ -420,11 +462,18 @@ public class ReadExpression {
                 numElements++;
             }
         }
+
+        //Check if final state is accept state
+        // if (pda != states.fail || leftParentheses != 0 || (input.charAt(input.length()-1) != ')' && !Character.isLetterOrDigit(input.charAt(input.length()-1)) && input.charAt(input.length()-1) != '.'))
+        // {
+        //     System.out.println("Invalid expression");
+        //     pda = states.fail;
+        // }
+
         if (pda == states.fail)
         {
             return -1;
         }
-
         while (!postfixStack.isEmpty()) {
             String add = "";
             add += postfixStack.pop();
@@ -432,9 +481,43 @@ public class ReadExpression {
             numElements++;
         }
         printPostfix(postfix, numElements);
-        System.out.println(currentFloat);
-        return -1;
-
+        LinkedStack<Float> floatStack = new LinkedStack<Float>();
+        for (int i = 0; i < numElements; i++)
+        {
+            if (postfix[i].equals("+"))
+            {
+                float one = floatStack.pop();
+                float two = floatStack.pop();
+                float result = one + two;
+                floatStack.push(result);
+            }
+            else if (postfix[i].equals("-"))
+            {
+                float two = floatStack.pop();
+                float one = floatStack.pop();
+                float result = one - two;
+                floatStack.push(result);
+            }
+            else if (postfix[i].equals("/"))
+            {
+                float two = floatStack.pop();
+                float one = floatStack.pop();
+                float result = one/two;
+                floatStack.push(result);
+            }
+            else if (postfix[i].equals("*"))
+            {
+                float one = floatStack.pop();
+                float two = floatStack.pop();
+                float result = one * two;
+                floatStack.push(result);
+            }
+            else
+            {
+                floatStack.push(reader.GetFloat(postfix[i]));
+            }
+        }
+        return floatStack.peek();
     }
 
     private static void printPostfix(String[] input, int length)
@@ -442,7 +525,7 @@ public class ReadExpression {
         System.out.print("Postfix: ");
         for (int i = 0; i < length; i++)
         {
-            System.out.print(input[i] + " ");
+            System.out.print(input[i] + ", ");
         }
         System.out.println();
     }
