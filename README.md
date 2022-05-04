@@ -1,4 +1,4 @@
-# 3110Project1
+# 3110Project2
 
 Project 2 for 3110:
 Evaluates java floating point literals and performs arithmetic operations with precedence using (+,-,/,*) and parentheses
