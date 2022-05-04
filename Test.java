@@ -19,7 +19,7 @@ public class Test
                 break;
             }
             value = expression.getValue(input);
-            // System.out.println(value);
+            System.out.println(value);
 
         }
         scanner.close();

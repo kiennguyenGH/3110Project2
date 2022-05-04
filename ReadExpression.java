@@ -276,6 +276,7 @@ public class ReadExpression {
                             postfix[numElements] = add;
                             numElements++;
                         }
+                        postfixStack.push(input.charAt(i));
                         pda = states.q5;
                     }
                     else if (input.charAt(i) == ' ')
