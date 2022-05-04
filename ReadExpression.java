@@ -16,6 +16,9 @@ public class ReadExpression {
         fail // fail
     }
     
+    //Traverses through String and separates operators and floats into postfix array using PDA enum
+    //Pushes to stack when open parentheses or operator (with empty) is read
+    //Pops stack when closed parentheses or operator (with nonempty stack) is read
     public float getValue(String input)
     {
         LinkedStack<Character> postfixStack = new LinkedStack<Character>();
@@ -502,13 +505,18 @@ public class ReadExpression {
         {
             return -1;
         }
+
+        //Push remaining operators to stack
         while (!postfixStack.isEmpty()) {
             String add = "";
             add += postfixStack.pop();
             postfix[numElements] = add;
             numElements++;
         }
+        //Print out postfix (for testing)
         printPostfix(postfix, numElements);
+
+        //Evaluate postfix
         LinkedStack<Float> floatStack = new LinkedStack<Float>();
         for (int i = 0; i < numElements; i++)
         {
@@ -548,6 +556,7 @@ public class ReadExpression {
         return floatStack.peek();
     }
 
+    //Traverses through postfix array and prints out each element
     private static void printPostfix(String[] input, int length)
     {
         System.out.print("Postfix: ");
@@ -558,6 +567,7 @@ public class ReadExpression {
         System.out.println();
     }
 
+    //Method for checking precedence of operators of postfix
     private static int precedence(char character) {
 		switch (character) {
 			case '+' : case '-':
