@@ -84,7 +84,7 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == ' ')
                     {
-                        if (!currentFloat.equals(""))
+                        if (!currentFloat.equals("") && reader.GetFloat(currentFloat) != -1)
                         {
                             postfix[numElements] = currentFloat;
                             currentFloat = "";
@@ -206,7 +206,7 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == ' ')
                     {
-                        if (!currentFloat.equals(""))
+                        if (!currentFloat.equals("") && reader.GetFloat(currentFloat) != -1)
                         {
                             postfix[numElements] = currentFloat;
                             currentFloat = "";
@@ -306,7 +306,7 @@ public class ReadExpression {
                     }
                     else if (input.charAt(i) == ' ')
                     {
-                        if (!currentFloat.equals(""))
+                        if (!currentFloat.equals("") && reader.GetFloat(currentFloat) != -1)
                         {
                             postfix[numElements] = currentFloat;
                             currentFloat = "";
