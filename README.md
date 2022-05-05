@@ -22,4 +22,4 @@ WARNING:
 - During long expressions, program will print out extra lines and random numbers, but that should not affect the final value of the evaluated expression printed out at the bottom
 
 
-Program may not handle certain underscore cases
+Program may not handle certain edge cases regarding spaces
